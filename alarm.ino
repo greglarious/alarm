@@ -7,8 +7,28 @@ int s3 = 5;
 //Mux in "SIG" pin
 int SIG_pin = A0;
 
-
+int prevValue[16];
+  char* sensors[16] = {
+    "front right window",
+    "front left window",
+    "laundry room door",
+    "dining room left window",
+    "dining room right window",
+    "unknown1",
+    "basement bedroom",
+    "mbr left window",
+    "mbr right window",
+    "mbr right center window",
+    "mbr left center window",
+    "mbr bath window",
+    "back middle window",
+    "back left window",
+    "back right window",
+    "unknown 2" };
 void setup(){
+  for (int i=0; i < 16; i++) {
+    prevValue[i] = -1;
+  }
   pinMode(s0, OUTPUT); 
   pinMode(s1, OUTPUT); 
   pinMode(s2, OUTPUT); 
@@ -29,13 +49,14 @@ void loop(){
   //Reports back Value at channel 6 is: 346
   for(int i = 0; i < 16; i ++){
     int val = readMux(i);
-    if (val > 0) {
+    if (prevValue[i] == -1 || abs(val - prevValue[i]) > 190) {    
       Serial.print("Value at channel ");
       Serial.print(i);
       Serial.print(" is : ");
       Serial.println(val);
     }
-    delay(25);
+    prevValue[i] = val;
+    delay(20);
   }
 
 }
@@ -57,6 +78,8 @@ void calc(int raw) {
 int readMux(int channel){
   int controlPin[] = {s0, s1, s2, s3};
 
+
+  
   int muxChannel[16][4]={
     {0,0,0,0}, //channel 0
     {1,0,0,0}, //channel 1
